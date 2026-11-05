@@ -1,0 +1,20 @@
+[Unit]
+Description=Alfia Gate render check
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/alfia-render-check-gate
+EnvironmentFile=/etc/alfia-render-check.env
+ExecStart=/usr/bin/node src/server.js
+Restart=always
+RestartSec=3
+# Chromium can grow; restart the service instead of letting the machine swap.
+MemoryMax=3G
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
