@@ -15,6 +15,7 @@ const broken = `<!doctype html><html><head><meta name="viewport" content="width=
   <section data-section="empty_block"></section>
   <section data-section="gallery"><img src="/missing.png" alt="" width="200" height="100"></section>
   <section data-section="footer"><a class="tiny" href="/x">x</a></section>
+  <section data-section="squeezed" style="display:grid;grid-template-columns:auto 1fr"><h1 style="font-size:64px;overflow-wrap:anywhere;width:min-content">Two twelve-week programs a year</h1><p>Side text</p></section>
 </body></html>`;
 const clean = `<!doctype html><html><head><meta name="viewport" content="width=device-width"></head><body style="margin:0;font:16px system-ui">
   <section data-section="hero"><h1>All good</h1><p>Readable text.</p><a href="/x" style="display:inline-block;padding:12px 20px">Get started</a></section>
@@ -48,6 +49,7 @@ test("finds overflow, contrast, empty sections, broken images and small tap targ
   assert.ok(has("empty", "desktop", "empty_block"), "empty section");
   assert.ok(has("image", "desktop", "gallery"), "broken image");
   assert.ok(has("tap-target", "mobile", "footer"), "small link on phones");
+  assert.ok(has("heading", "desktop", "squeezed"), "heading cut inside words");
   assert.match(cookieSeen || "", /alfia_gate_orbit=check-token/, "the preview cookie is sent");
 });
 

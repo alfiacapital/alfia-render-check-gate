@@ -111,6 +111,30 @@ export function audit({ mobile }) {
     }
   }
 
+  // ---------- Headings that cut words or wrap to one word per line ----------
+  // Counts rendered lines from the text's line boxes, so it works for any font and language.
+  const lineCount = (el) => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const tops = new Set([...range.getClientRects()].filter((r) => r.width > 1).map((r) => Math.round(r.top)));
+    return tops.size;
+  };
+  let headingIssues = 0;
+  for (const el of document.querySelectorAll("h1, h2, h3")) {
+    if (headingIssues >= 4 || !isVisible(el)) continue;
+    const words = (el.innerText || "").trim().split(/\s+/).filter(Boolean);
+    if (words.length < 2) continue;
+    const lines = lineCount(el);
+    const width = Math.round(el.getBoundingClientRect().width);
+    if (lines > words.length) {
+      headingIssues += 1;
+      add("heading", el, `Heading "${sampleText(el)}" is cut inside words: ${words.length} words on ${lines} lines in a ${width}px wide column. Make the column wider or the heading smaller, and never use overflow-wrap:anywhere or word-break:break-all on it.`);
+    } else if (lines >= 5 && words.length / lines < 1.5) {
+      headingIssues += 1;
+      add("heading", el, `Heading "${sampleText(el)}" wraps to about one word per line (${lines} lines, ${width}px wide). Make its column wider or the heading smaller.`);
+    }
+  }
+
   // ---------- Empty or collapsed sections ----------
   for (const section of document.querySelectorAll("[data-section]")) {
     const rect = section.getBoundingClientRect();

@@ -10,6 +10,7 @@ Opens Alfia Gate pages in a real browser (Chromium, through Playwright) at **des
 | `empty` | A Gate section (`[data-section]`) that renders empty or collapsed |
 | `image` | An image that does not load |
 | `overlap` | Text covering other text |
+| `heading` | A heading cut inside words, or wrapping to about one word per line |
 | `tap-target` | Links and buttons smaller than 32×32px on phones |
 | `load` / `error` | The page did not load, or the check could not run |
 
