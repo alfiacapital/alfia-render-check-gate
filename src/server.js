@@ -52,7 +52,7 @@ function validate(body) {
   });
   const views = Array.isArray(body.viewports) && body.viewports.length ? body.viewports.filter((name) => name in viewports) : ["desktop", "mobile"];
   const cookie = body.cookie && typeof body.cookie.name === "string" && typeof body.cookie.value === "string" ? { name: body.cookie.name.slice(0, 120), value: body.cookie.value.slice(0, 512) } : null;
-  return { pages: clean, views: views.length ? views : ["desktop", "mobile"], cookie };
+  return { pages: clean, views: views.length ? views : ["desktop", "mobile"], cookie, screenshots: body.screenshots === true };
 }
 
 const server = http.createServer(async (req, res) => {
@@ -60,9 +60,14 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && req.url === "/health") return json(res, 200, { ok: true });
     if (req.method !== "POST" || req.url !== "/check") return json(res, 404, { message: "Not found." });
     if (!authorized(req)) return json(res, 401, { message: "Unauthorized." });
-    const { pages, views, cookie } = validate(await readBody(req));
-    const result = await checkPages(pages, cookie, views);
-    console.log(`checked ${pages.length} page(s) × ${views.length} viewport(s) in ${result.ms}ms`);
+    const { pages, views, cookie, screenshots } = validate(await readBody(req));
+    const result = await checkPages(pages, cookie, views, screenshots);
+    console.log(`checked ${pages.length} page(s) × ${views.length} viewport(s)${screenshots ? " with screenshots" : ""} in ${result.ms}ms`);
+    // One line per page: what was found, so the journal shows each design's problems.
+    for (const page of result.pages) {
+      const summary = page.issues.map((issue) => `${issue.viewport}·${issue.section ?? "page"}·${issue.type}`).join(", ");
+      console.log(`  ${page.path}: ${page.issues.length ? summary : "no problems"}`);
+    }
     return json(res, 200, result);
   } catch (error) {
     const status = error.status || 500;

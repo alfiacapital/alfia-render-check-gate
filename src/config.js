@@ -12,6 +12,9 @@ export const config = {
   concurrency: number(process.env.MAX_CONCURRENCY, 2, 1, 8),
   pageTimeoutMs: number(process.env.PAGE_TIMEOUT_MS, 30000, 5000, 120000),
   maxPages: number(process.env.MAX_PAGES, 24, 1, 60),
+  // Tallest screenshot, in CSS pixels; longer pages are cut at this height.
+  maxShotDesktop: number(process.env.MAX_SHOT_DESKTOP, 4200, 900, 12000),
+  maxShotMobile: number(process.env.MAX_SHOT_MOBILE, 6000, 844, 16000),
   // Comma-separated hosts the service may open, e.g. "gate.alfia.com.sa,dev-gate.alfia.com.sa".
   // Empty allows any host (only for local testing).
   allowedHosts: (process.env.ALLOWED_HOSTS || "")

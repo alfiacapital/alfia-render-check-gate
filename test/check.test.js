@@ -56,6 +56,15 @@ test("a clean page has no issues", async () => {
   assert.deepEqual(pages[0].issues, []);
 });
 
+test("screenshots are returned as JPEG for each viewport when asked", async () => {
+  const { pages } = await checkPages([{ path: "/clean", url: `${origin}/clean` }], null, ["desktop", "mobile"], true);
+  for (const name of ["desktop", "mobile"]) {
+    const image = Buffer.from(pages[0].screenshots[name], "base64");
+    assert.equal(image[0], 0xff, `${name} is a JPEG`);
+    assert.equal(image[1], 0xd8);
+  }
+});
+
 test("a page that cannot load reports one load issue per viewport", async () => {
   const { pages } = await checkPages([{ path: "/down", url: "http://127.0.0.1:9/" }], null, ["desktop"]);
   assert.equal(pages[0].issues.length, 1);
